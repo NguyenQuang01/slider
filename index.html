@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Carousel with Swipe and Next Button Opacity</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"
+    />
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+      html {
+        height: 100%;
+      }
+      body {
+        background: #eee;
+        font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        color: #000;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+
+      .carousel {
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+        height: 100%;
+      }
+
+      .carousel-inner {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+        width: 100%;
+        height: 100%;
+      }
+
+      .carousel-item {
+        min-width: 100%;
+        box-sizing: border-box;
+        text-align: center;
+        font-size: 18px;
+        background: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .carousel-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .carousel-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        font-size: 24px;
+        color: #1900ff;
+        background: transparent;
+        border: none;
+        opacity: 1;
+        transition: opacity 0.3s ease-in-out;
+      }
+
+      .prev-btn {
+        left: 10px;
+      }
+
+      .next-btn {
+        right: 10px;
+      }
+
+      .prev-btn[disabled] {
+        opacity: 0.5;
+      }
+      .next-btn[disabled] {
+        opacity: 0.5;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Carousel with Swipe and Next Button Opacity -->
+    <div class="carousel" id="myCarousel">
+      <div class="carousel-inner">
+        <div class="carousel-item">Slide 1</div>
+        <div class="carousel-item">Slide 2</div>
+        <div class="carousel-item">Slide 3</div>
+        <div class="carousel-item">Slide 4</div>
+        <div class="carousel-item">Slide 5</div>
+        <div class="carousel-item">Slide 6</div>
+        <div class="carousel-item">Slide 7</div>
+        <div class="carousel-item">Slide 8</div>
+        <div class="carousel-item">Slide 9</div>
+        <div class="carousel-item">Slide 10</div>
+        <div class="carousel-item">Slide 11</div>
+        <div class="carousel-item">Slide 12</div>
+        <div class="carousel-item">Slide 13</div>
+      </div>
+      <button class="carousel-btn prev-btn" onclick="prevSlide()" disabled>
+        <i class="ph ph-caret-left" style="font-size: 50px"></i>
+      </button>
+      <button class="carousel-btn next-btn" onclick="nextSlide()">
+        <i class="ph ph-caret-right" style="font-size: 50px"></i>
+      </button>
+    </div>
+
+    <script>
+      let touchStartX = 0;
+      let touchEndX = 0;
+      let isSwiping = false;
+
+      document
+        .getElementById("myCarousel")
+        .addEventListener("mousedown", function (e) {
+          touchStartX = e.clientX;
+          isSwiping = true;
+        });
+
+      document
+        .getElementById("myCarousel")
+        .addEventListener("mousemove", function (e) {
+          if (isSwiping) {
+            touchEndX = e.clientX;
+          }
+        });
+
+      document.addEventListener("mouseup", function () {
+        if (isSwiping) {
+          isSwiping = false;
+          handleSwipe();
+        }
+      });
+
+      document
+        .getElementById("myCarousel")
+        .addEventListener("touchstart", function (e) {
+          touchStartX = e.touches[0].clientX;
+          isSwiping = true;
+        });
+
+      document
+        .getElementById("myCarousel")
+        .addEventListener("touchmove", function (e) {
+          if (isSwiping) {
+            touchEndX = e.touches[0].clientX;
+          }
+        });
+
+      document.addEventListener("touchend", function () {
+        if (isSwiping) {
+          isSwiping = false;
+          handleSwipe();
+        }
+      });
+
+      function handleSwipe() {
+        const deltaX = touchEndX - touchStartX;
+        if (Math.abs(deltaX) > 50) {
+          if (deltaX > 0 && currentIndex > 0) {
+            prevSlide();
+          } else if (deltaX < 0 && currentIndex === totalSlides - 1) {
+            const translateValue = -Number(totalSlides - 1) * 100 - 60 + "%";
+            const translateValueInitial = -Number(totalSlides - 1) * 100 + "%";
+            carouselInner.style.transition = "transform 1s ease-in-out";
+            carouselInner.style.transform =
+              "translateX(" + translateValue + ")";
+            setTimeout(() => {
+              carouselInner.style.transition = "transform 1s ease-in-out";
+              carouselInner.style.transform =
+                "translateX(" + translateValue + ")";
+              setTimeout(() => {
+                carouselInner.style.transition = "transform 1s ease-in-out";
+                carouselInner.style.transform =
+                  "translateX(" + translateValueInitial + ")";
+                setTimeout(() => {
+                  carouselInner.style.transition = "";
+                  updateButtonStates();
+                }, 200);
+              }, 200);
+            }, 200);
+          } else if (deltaX < 0 && currentIndex < totalSlides - 1) {
+            nextSlide();
+          } else if (deltaX > 0 && currentIndex === 0) {
+            carouselInner.style.transition = "transform 1s ease-in-out";
+            carouselInner.style.transform = "translateX(60%)";
+            setTimeout(() => {
+              carouselInner.style.transition = "transform 1s ease-in-out";
+              carouselInner.style.transform = "translateX(60%)";
+              setTimeout(() => {
+                carouselInner.style.transition = "transform 1s ease-in-out";
+                carouselInner.style.transform = "translateX(0%)";
+                setTimeout(() => {
+                  carouselInner.style.transition = "";
+                  updateButtonStates();
+                }, 200);
+              }, 200);
+            }, 200);
+          }
+        }
+      }
+
+      let currentIndex = 0;
+      const totalSlides = document.querySelectorAll(".carousel-item").length;
+      const carouselInner = document.querySelector(".carousel-inner");
+      const prevBtn = document.querySelector(".prev-btn");
+      const nextBtn = document.querySelector(".next-btn");
+
+      function showSlide(index) {
+        const minIndex = 0;
+        const maxIndex = totalSlides - 1;
+
+        if (index < minIndex) {
+          index = minIndex;
+        } else if (index > maxIndex) {
+          index = maxIndex;
+        }
+
+        const translateValue = -index * 100 + "%";
+        carouselInner.style.transform = "translateX(" + translateValue + ")";
+        currentIndex = index;
+
+        updateButtonStates();
+      }
+
+      function prevSlide() {
+        showSlide(currentIndex - 1);
+      }
+
+      function nextSlide() {
+        showSlide(currentIndex + 1);
+      }
+
+      function updateButtonStates() {
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === totalSlides - 1;
+      }
+    </script>
+  </body>
+</html>
